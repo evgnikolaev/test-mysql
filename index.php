@@ -202,11 +202,37 @@ mysql workbench - графический клиент для доступа к �
 			Делаем пара значений order_id и product_id первичными ключами.
 
 
-12)
+12) Объединение данных из нескольких таблиц
+	 1 способ: Неправильный - делать много запросов, и после собирать данные.
+        SELECT * from product;
+		SELECT * FROM category WHERE id IN(1,2,3);
+		SELECT * FROM brand WHERE id=1;
+
+
+13) inner join  -  выборка по пересечению таблиц.
+
+		SELECT * FROM product INNER JOIN category ON  product.category_id = category.id
+
+    Объединять можно сколько угодно таблиц.
+		SELECT
+			product.id,
+			brand.name,
+			product_type.type,
+			category.name,
+			product.price,
+			category.discount
+		FROM product
+			INNER JOIN category ON  product.category_id = category.id       -- к таблице продуктов приклеиваем таблицу категорий
+			INNER JOIN brand ON  product.brand_id = brand.id                --  к общей получившейся таблице, приклеиваем таблицу бренды
+			INNER JOIN product_type ON product.type_id = product_type.id    --  к общей получившейся таблице, приклеиваем таблицу типов
+		WHERE category.alias_name!='women closing'
+		order BY category.alias_name asc
+
+ !!! Особенность inner join  попадают только пересеченные значения таблиц, не все !!!!
 
 
 
-
+14)
 
 
 
