@@ -269,16 +269,32 @@ mysql workbench - графический клиент для доступа к �
 
 
 16) оператор union
+    FULL OUTER JOIN -  получаем все значения как таблицы А так и таблицы B.
+
+    В других языках это выгдядело бы так:
+    SELECT * FROM `order`
+		FULL OUTER JOIN order_products ON 	order_products.order_id=`order`.ID
+		FULL OUTER JOIN product ON order_products.product_id = product.id
+
+    !!!! Но в mysql нет оператора FULL OUTER JOIN, вместо этого можно склеивать несколько sql-запросов при помощи UNION немного костыльным путем.
+	UNION - объединение результатов (приклеивает строчки 1-го и 2-го запроса)    "16 union.jpg".
 
 
 
+	-- Получаем все заказы
+	SELECT * FROM `order`
+		left JOIN order_products ON 	order_products.order_id=`order`.ID
+		left JOIN product ON order_products.product_id = product.id
+
+	UNION   -- при помощи union склеиваем 2 запроса (количество полей в обоих запросах должно совпадать!)
+
+    -- Получаем все товары
+	SELECT * FROM `order`
+		inner JOIN order_products ON 	order_products.order_id=`order`.ID
+		right JOIN product ON order_products.product_id = product.id;
 
 
-
-
-
-
-
+17) Агрегирубщие ф-ии
 
 
 
