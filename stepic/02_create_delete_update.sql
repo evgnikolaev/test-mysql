@@ -211,10 +211,124 @@ https://stepik.org/course/63054/syllabus
 
 
 
-Удаление записей, использование связанных таблиц
+        Удаление записей, использование связанных таблиц
 
-        DELETE FROM author
-        USING
-            author
-            INNER JOIN book ON author.author_id = book.author_id
-        WHERE book.amount < 3;
+            DELETE FROM author
+            USING
+                author
+                INNER JOIN book ON author.author_id = book.author_id
+            WHERE book.amount < 3;
+
+
+
+
+
+        Сложный запрос с алиасами
+
+            delete from a
+
+            using
+                applicant a
+                inner join enrollee e on a.enrollee_id = e.enrollee_id
+                inner join program_enrollee pe on e.enrollee_id = pe.enrollee_id
+                inner join program p on p.program_id = pe.program_id
+                inner join program_subject ps on ps.program_id = p.program_id
+                inner join subject s on s.subject_id = ps.subject_id
+                inner join enrollee_subject es
+                        on s.subject_id = es.subject_id
+                        and e.enrollee_id = es.enrollee_id
+
+            where es.result < ps.min_result
+                and e.enrollee_id = a.enrollee_id
+                and p.program_id = a.program_id
+
+
+
+
+
+
+
+        Используйте DROP, если:
+
+            - Нужно полностью удалить таблицу (или другую структуру) из базы данных.
+            - Больше не требуется использовать эту таблицу.
+
+        Используйте DELETE, если:
+
+            - Нужно удалить только определенные строки (с условием WHERE).
+            - Важно сохранить возможность отката изменений.
+            - Таблица имеет внешние ключи.
+
+        Используйте TRUNCATE, если:
+
+            - Нужно быстро удалить все строки из таблицы.
+            - Необходимо сбросить значения автоинкремента.
+            - Таблица не имеет внешних ключей или они временно отключены.
+
+
+
+
+
+
+
+
+
+
+
+6.  ALTER TABLE
+
+    Для вставки нового столбца используется SQL запросы:
+
+            ALTER TABLE таблица ADD имя_столбца тип; - вставляет столбец после последнего
+            ALTER TABLE таблица ADD имя_столбца тип FIRST; - вставляет столбец перед первым
+            ALTER TABLE таблица ADD имя_столбца тип AFTER имя_столбца_1; - вставляет столбец после укзанного столбца
+
+
+    Для удаления столбца используется SQL запросы:
+
+            ALTER TABLE таблица DROP COLUMN имя_столбца; - удаляет столбец с заданным именем
+            ALTER TABLE таблица DROP имя_столбца; - ключевое слово COLUMN не обязательно указывать
+            ALTER TABLE таблица DROP имя_столбца,
+                                DROP имя_столбца_1; - удаляет два столбца
+
+
+    Для переименования столбца используется  запрос (тип данных указывать обязательно):
+
+            ALTER TABLE таблица CHANGE имя_столбца новое_имя_столбца ТИП ДАННЫХ;
+
+    Для изменения типа  столбца используется запрос (два раза указывать имя столбца обязательно):
+
+            ALTER TABLE таблица CHANGE имя_столбца имя_столбца НОВЫЙ_ТИП_ДАННЫХ;
+
+
+
+
+
+
+7. Переменные
+
+        SET @row_num := 0;
+
+        SELECT *, (@row_num := @row_num + 1) AS str_num
+        FROM  applicant_order;
+
+
+    Присваивание переменной происходит на каждой записи
+
+        SET @num_pr := 0;
+        SET @row_num := 1;
+
+        SELECT *,
+             if(program_id = @num_pr, @row_num := @row_num + 1, @row_num := 1) AS str_num,
+             @num_pr := program_id AS add_var
+        from applicant_order;
+
+
+
+
+
+
+
+
+
+

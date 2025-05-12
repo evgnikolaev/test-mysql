@@ -368,6 +368,27 @@ UNION ALL   - с повторением
 
 
 
+12. join-ить можно и вложенные таблицы
+
+            update
+                applicant app
+                inner join
+                    (
+                        select ea.enrollee_id,  sum(a.bonus) as dop
+                        from enrollee_achievement ea
+                            inner join achievement a on ea.achievement_id = a.achievement_id
+                        group by ea.enrollee_id
+
+                    ) as bonus
+                        on app.enrollee_id =  bonus.enrollee_id
+
+            SET app.itog = app.itog + bonus.dop
+
+
+
+
+
+
 LEFT("abcde", 3) -> "abc"     Чтобы выделить крайние левые n символов из строки используется функция LEFT(строка, n):
 CONCAT("ab","cd") -> "abcd"   Соединение строк осуществляется с помощью функции CONCAT(строка_1, строка_2):
  NOW() текущую дату
