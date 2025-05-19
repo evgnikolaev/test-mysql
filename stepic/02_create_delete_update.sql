@@ -305,23 +305,7 @@ https://stepik.org/course/63054/syllabus
 
 
 
-7. Переменные
 
-        SET @row_num := 0;
-
-        SELECT *, (@row_num := @row_num + 1) AS str_num
-        FROM  applicant_order;
-
-
-    Присваивание переменной происходит на каждой записи
-
-        SET @num_pr := 0;
-        SET @row_num := 1;
-
-        SELECT *,
-             if(program_id = @num_pr, @row_num := @row_num + 1, @row_num := 1) AS str_num,
-             @num_pr := program_id AS add_var
-        from applicant_order;
 
 
 

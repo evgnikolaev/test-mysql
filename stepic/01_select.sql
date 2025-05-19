@@ -389,9 +389,180 @@ UNION ALL   - с повторением
 
 
 
+7. Переменные
+
+        SET @row_num := 0;
+
+        SELECT *, (@row_num := @row_num + 1) AS str_num
+        FROM  applicant_order;
+
+
+    Присваивание переменной происходит на каждой записи
+
+        SET @num_pr := 0;
+        SET @row_num := 1;
+
+        SELECT *,
+             if(program_id = @num_pr, @row_num := @row_num + 1, @row_num := 1) AS str_num,
+             @num_pr := program_id AS add_var
+        from applicant_order;
+
+
+
+
+
+
+
+
+
+
+13.  Выборка данных по нескольким условиям, оператор CASE
+
+    CASE не применим к столбцу, который вычисляет. CASE применяется уже к готовым числам.
+
+    /* CASE можно использовать в  SELECT, UPDATE, DELETE, SET, WHERE, ORDER BY, HAVING - всюду, где можно использовать выражения. */
+
+    CASE
+         WHEN логическое_выражение_1 THEN выражение_1
+         WHEN логическое_выражение_2 THEN выражение_2
+         ...
+         ELSE выражение_else
+    END
+
+
+
+    /* Если логическое выражения во всех WHEN представляет собой сравнение на равенство с некоторым значением, то оператор CASE можно записать в виде:  */
+
+    CASE столбец
+         WHEN значение_1 THEN выражение_1
+         WHEN значение_2 THEN выражение_2
+         ...
+         ELSE значение_else
+    END
+
+
+
+    Отнести каждого студента к группе в зависимости от пройденных шагов.
+
+
+        SELECT student_name, rate,
+            CASE
+                WHEN rate <= 10 THEN "I"
+                WHEN rate <= 15 THEN "II"
+                WHEN rate <= 27 THEN "III"
+                ELSE "IV"
+            END AS Группа
+        FROM
+            (
+             SELECT student_name, count(*) as rate
+             FROM
+                 (
+                  SELECT student_name, step_id
+                  FROM
+                      student
+                      INNER JOIN step_student USING(student_id)
+                  WHERE result = "correct"
+                  GROUP BY student_name, step_id
+                 ) query_in
+             GROUP BY student_name
+             ORDER BY 2
+            ) query_in_1;
+
+
+
+
+
+
+
+
+
+Полезные ф-ии:
 LEFT("abcde", 3) -> "abc"     Чтобы выделить крайние левые n символов из строки используется функция LEFT(строка, n):
 CONCAT("ab","cd") -> "abcd"   Соединение строк осуществляется с помощью функции CONCAT(строка_1, строка_2):
- NOW() текущую дату
+NOW() текущую дату
+
+
+
+
+14. Табличные выражения, оператор WITH
+
+
+В табличном выражении определяется запрос, результат которого нужно использовать в основной части запроса после SELECT.
+При этом основной запрос может обратиться к столбцам результата табличного выражения через имена, заданные в заголовке WITH.
+При этом количество имен должно совпадать с количеством результирующих столбцов табличного выражения.
+
+В одном запросе может быть несколько табличных выражений. При этом в каждом табличном выражении можно использовать все предшествующие ему табличные выражения.
+
+В табличном выражении необязательно давать имена столбцам результата. В этом случае в основном запросе можно использовать имена столбцов, указанных после SELECT в табличном выражении.
+При наличии одинаковых имен в нескольких табличных выражениях необходимо использовать полное имя столбца (имя табличного выражения, точка, имя столбца).
+
+
+имя_1, имя_2,... - алиас в столбца в селекте
+
+
+WITH имя_выражения (имя_1, имя_2,...)
+  AS
+    (
+     SELECT столбец_1, столбец_2,
+     FROM
+       ...
+     )
+
+SELECT ...
+   FROM имя_выражения
+               ...
+
+
+
+                    WITH get_count_correct (st_n_c, count_correct)
+                      AS (
+                          SELECT step_name, count(*)
+                          FROM
+                              step
+                              INNER JOIN step_student USING (step_id)
+                          WHERE result = "correct"
+                          GROUP BY step_name
+                       ),
+
+                      get_count_wrong (st_n_w, count_wrong)
+                      AS (
+                        SELECT step_name, count(*)
+                        FROM
+                            step
+                            INNER JOIN step_student USING (step_id)
+                        WHERE result = "wrong"
+                        GROUP BY step_name
+                       )
+
+
+                    SELECT st_n_c AS Шаг,
+                        ROUND(count_correct / (count_correct + count_wrong) * 100) AS Успешность
+                    FROM
+                        get_count_correct
+                        INNER JOIN get_count_wrong ON st_n_c = st_n_w
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
